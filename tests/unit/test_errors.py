@@ -14,6 +14,7 @@ def test_concrete_errors_own_their_public_message() -> None:
     forbidden = PostOwnershipError(action="edit")
 
     assert str(conflict) == conflict.message
+    assert conflict.code == "email_already_exists"
     assert forbidden.message == "Only the author can edit this post"
 
 

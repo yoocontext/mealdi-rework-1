@@ -9,6 +9,7 @@ from bootstrap.ioc.container import create_container
 from bootstrap.settings import Settings
 from delivery.api.v1.http.exceptions import install_application_error_handlers
 from delivery.api.v1.http.handlers import routers
+from delivery.api.v1.http.request_id import install_request_id_middleware
 from delivery.web import router as web_router
 from delivery.web import static as web_static
 
@@ -23,6 +24,7 @@ def create_app(*, settings: Settings | None = None) -> FastAPI:
         await container.close()
 
     app = FastAPI(title="Mealdi API", version="1.0.0", lifespan=lifespan)
+    install_request_id_middleware(app=app)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=resolved_settings.cors_origins,

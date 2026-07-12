@@ -16,6 +16,10 @@ class SerializationError(DmError):
     operation: str
 
     @property
+    def code(self) -> str:
+        return "serialization_error"
+
+    @property
     def message(self) -> str:
         return (
             f"Could not {self.operation} {self.entity} "

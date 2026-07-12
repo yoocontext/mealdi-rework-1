@@ -146,6 +146,16 @@ def test_project_owned_parameters_are_keyword_only() -> None:
             "src/delivery/api/v1/http/exceptions.py",
             "handle_application_error",
         ),
+        (
+            "src/delivery/api/v1/http/exceptions.py",
+            "handle_request_validation_error",
+        ),
+        ("src/delivery/api/v1/http/exceptions.py", "handle_http_error"),
+        (
+            "src/delivery/api/v1/http/exceptions.py",
+            "handle_unexpected_error",
+        ),
+        ("src/delivery/api/v1/http/request_id.py", "attach_request_id"),
     }
     violations: list[str] = []
     for path in source_root.rglob("*.py"):

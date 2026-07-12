@@ -12,5 +12,9 @@ class SecurityError(InfraError, ABC):
 @dataclass(kw_only=True, slots=True)
 class InvalidTokenError(SecurityError):
     @property
+    def code(self) -> str:
+        return "invalid_token"
+
+    @property
     def message(self) -> str:
         return "Token verification failed"

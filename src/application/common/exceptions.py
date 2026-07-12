@@ -15,12 +15,21 @@ class AppError(Exception, ABC):
         if not isinstance(message, str) or not message:
             raise TypeError("Concrete AppError.message must return non-empty str")
 
+        code = self.code
+        if not isinstance(code, str) or not code:
+            raise TypeError("Concrete AppError.code must return non-empty str")
+
         Exception.__init__(self, message)
 
     @property
     @abstractmethod
     def message(self) -> str:
         """Return a safe, human-readable description of the failure."""
+
+    @property
+    @abstractmethod
+    def code(self) -> str:
+        """Return a stable machine-readable identifier for the failure."""
 
     def __str__(self) -> str:
         return self.message
@@ -39,6 +48,10 @@ class AuthenticationError(ApplicationError, ABC):
 @dataclass(kw_only=True, slots=True)
 class InvalidCredentialsError(AuthenticationError):
     @property
+    def code(self) -> str:
+        return "invalid_credentials"
+
+    @property
     def message(self) -> str:
         return "Invalid email or password"
 
@@ -46,12 +59,20 @@ class InvalidCredentialsError(AuthenticationError):
 @dataclass(kw_only=True, slots=True)
 class InvalidAccessTokenError(AuthenticationError):
     @property
+    def code(self) -> str:
+        return "invalid_access_token"
+
+    @property
     def message(self) -> str:
         return "Invalid access token"
 
 
 @dataclass(kw_only=True, slots=True)
 class InvalidRefreshTokenError(AuthenticationError):
+    @property
+    def code(self) -> str:
+        return "invalid_refresh_token"
+
     @property
     def message(self) -> str:
         return "Invalid refresh token"
@@ -65,6 +86,10 @@ class ConflictError(ApplicationError, ABC):
 @dataclass(kw_only=True, slots=True)
 class EmailAlreadyExistsError(ConflictError):
     @property
+    def code(self) -> str:
+        return "email_already_exists"
+
+    @property
     def message(self) -> str:
         return "A user with this email already exists"
 
@@ -77,6 +102,10 @@ class ForbiddenError(ApplicationError, ABC):
 @dataclass(kw_only=True, slots=True)
 class SelfMessagingError(ForbiddenError):
     @property
+    def code(self) -> str:
+        return "self_messaging_forbidden"
+
+    @property
     def message(self) -> str:
         return "You cannot send a message to yourself"
 
@@ -84,6 +113,10 @@ class SelfMessagingError(ForbiddenError):
 @dataclass(kw_only=True, slots=True)
 class PostOwnershipError(ForbiddenError):
     action: str
+
+    @property
+    def code(self) -> str:
+        return "post_ownership_forbidden"
 
     @property
     def message(self) -> str:
@@ -100,12 +133,20 @@ class UserNotFoundError(NotFoundError):
     role: str = "User"
 
     @property
+    def code(self) -> str:
+        return "user_not_found"
+
+    @property
     def message(self) -> str:
         return f"{self.role} not found"
 
 
 @dataclass(kw_only=True, slots=True)
 class PostNotFoundError(NotFoundError):
+    @property
+    def code(self) -> str:
+        return "post_not_found"
+
     @property
     def message(self) -> str:
         return "Post not found"
