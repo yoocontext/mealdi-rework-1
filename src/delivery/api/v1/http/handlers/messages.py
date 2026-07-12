@@ -12,6 +12,7 @@ from delivery.api.v1.http.mappers.messages import (
     map_message_to_rp,
     map_messages_to_rp,
 )
+from delivery.api.v1.http.schemas.errors import ErrorResponse
 from delivery.api.v1.http.schemas.messages import (
     MessageListRp,
     MessageRp,
@@ -22,7 +23,29 @@ from delivery.common.connections import MessageConnections
 router = APIRouter(prefix="/api/v1/http/messages", tags=["messages"])
 
 
-@router.get("/{peer_id}", response_model=MessageListRp)
+@router.get(
+    "/{peer_id}",
+    response_model=MessageListRp,
+    description="List the authenticated user's conversation with another user.",
+    responses={
+        status.HTTP_401_UNAUTHORIZED: {
+            "model": ErrorResponse,
+            "description": "Access token is missing or invalid.",
+        },
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorResponse,
+            "description": "Conversation peer was not found.",
+        },
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {
+            "model": ErrorResponse,
+            "description": "Path or query parameters are invalid.",
+        },
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {
+            "model": ErrorResponse,
+            "description": "Internal server error.",
+        },
+    },
+)
 @inject
 async def list_messages(
     *,
@@ -44,7 +67,34 @@ async def list_messages(
     return map_messages_to_rp(messages=result.messages)
 
 
-@router.post("", response_model=MessageRp, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "",
+    response_model=MessageRp,
+    status_code=status.HTTP_201_CREATED,
+    description="Send a direct message to another user.",
+    responses={
+        status.HTTP_401_UNAUTHORIZED: {
+            "model": ErrorResponse,
+            "description": "Access token is missing or invalid.",
+        },
+        status.HTTP_403_FORBIDDEN: {
+            "model": ErrorResponse,
+            "description": "A user cannot send a message to themselves.",
+        },
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorResponse,
+            "description": "Message recipient was not found.",
+        },
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {
+            "model": ErrorResponse,
+            "description": "Request validation failed.",
+        },
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {
+            "model": ErrorResponse,
+            "description": "Internal server error.",
+        },
+    },
+)
 @inject
 async def send_message(
     *,

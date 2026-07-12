@@ -15,6 +15,7 @@ from application.use_cases.posts import (
 )
 from delivery.api.v1.http.dependencies import CurrentUser
 from delivery.api.v1.http.mappers.posts import map_post_to_rp, map_posts_to_rp
+from delivery.api.v1.http.schemas.errors import ErrorResponse
 from delivery.api.v1.http.schemas.posts import (
     CreatePostRq,
     PostListRp,
@@ -26,7 +27,21 @@ from delivery.api.v1.http.schemas.posts import (
 router = APIRouter(prefix="/api/v1/http/posts", tags=["posts"])
 
 
-@router.get("", response_model=PostListRp)
+@router.get(
+    "",
+    response_model=PostListRp,
+    description="List and search posts in the feed.",
+    responses={
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {
+            "model": ErrorResponse,
+            "description": "Query parameters are invalid.",
+        },
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {
+            "model": ErrorResponse,
+            "description": "Internal server error.",
+        },
+    },
+)
 @inject
 async def list_posts(
     *,
@@ -48,7 +63,26 @@ async def list_posts(
     return map_posts_to_rp(posts=result.posts)
 
 
-@router.post("", response_model=PostRp, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "",
+    response_model=PostRp,
+    status_code=status.HTTP_201_CREATED,
+    description="Create a post for the authenticated user.",
+    responses={
+        status.HTTP_401_UNAUTHORIZED: {
+            "model": ErrorResponse,
+            "description": "Access token is missing or invalid.",
+        },
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {
+            "model": ErrorResponse,
+            "description": "Request validation failed.",
+        },
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {
+            "model": ErrorResponse,
+            "description": "Internal server error.",
+        },
+    },
+)
 @inject
 async def create_post(
     *,
@@ -63,7 +97,33 @@ async def create_post(
     return map_post_to_rp(post=result.post)
 
 
-@router.put("/{post_id}", response_model=PostRp)
+@router.put(
+    "/{post_id}",
+    response_model=PostRp,
+    description="Replace the content of an owned post.",
+    responses={
+        status.HTTP_401_UNAUTHORIZED: {
+            "model": ErrorResponse,
+            "description": "Access token is missing or invalid.",
+        },
+        status.HTTP_403_FORBIDDEN: {
+            "model": ErrorResponse,
+            "description": "Only the post author can edit the post.",
+        },
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorResponse,
+            "description": "Post was not found.",
+        },
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {
+            "model": ErrorResponse,
+            "description": "Path or request data is invalid.",
+        },
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {
+            "model": ErrorResponse,
+            "description": "Internal server error.",
+        },
+    },
+)
 @inject
 async def update_post(
     *,
@@ -83,7 +143,33 @@ async def update_post(
     return map_post_to_rp(post=result.post)
 
 
-@router.delete("/{post_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{post_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    description="Delete an owned post.",
+    responses={
+        status.HTTP_401_UNAUTHORIZED: {
+            "model": ErrorResponse,
+            "description": "Access token is missing or invalid.",
+        },
+        status.HTTP_403_FORBIDDEN: {
+            "model": ErrorResponse,
+            "description": "Only the post author can delete the post.",
+        },
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorResponse,
+            "description": "Post was not found.",
+        },
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {
+            "model": ErrorResponse,
+            "description": "Path parameter is invalid.",
+        },
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {
+            "model": ErrorResponse,
+            "description": "Internal server error.",
+        },
+    },
+)
 @inject
 async def delete_post(
     *,
@@ -98,7 +184,29 @@ async def delete_post(
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.post("/{post_id}/likes/toggle", response_model=ToggleLikeRp)
+@router.post(
+    "/{post_id}/likes/toggle",
+    response_model=ToggleLikeRp,
+    description="Add or remove the authenticated user's like on a post.",
+    responses={
+        status.HTTP_401_UNAUTHORIZED: {
+            "model": ErrorResponse,
+            "description": "Access token is missing or invalid.",
+        },
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorResponse,
+            "description": "Post was not found.",
+        },
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {
+            "model": ErrorResponse,
+            "description": "Path parameter is invalid.",
+        },
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {
+            "model": ErrorResponse,
+            "description": "Internal server error.",
+        },
+    },
+)
 @inject
 async def toggle_post_like(
     *,
