@@ -6,8 +6,7 @@ from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from bootstrap.settings import Settings
-from infra.common.orm import Base
-from infra.orm import LikeOrm, MessageOrm, PostOrm, RefreshSessionOrm, UserOrm
+from infra.orm import Base, LikeOrm, MessageOrm, PostOrm, RefreshSessionOrm, UserOrm
 
 _MODELS = (LikeOrm, MessageOrm, PostOrm, RefreshSessionOrm, UserOrm)
 

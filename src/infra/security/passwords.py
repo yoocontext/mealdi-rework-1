@@ -2,8 +2,8 @@ from pwdlib import PasswordHash
 
 
 class Argon2PasswordHasher:
-    def __init__(self) -> None:
-        self._password_hash = PasswordHash.recommended()
+    def __init__(self, *, password_hash: PasswordHash) -> None:
+        self._password_hash = password_hash
         self._dummy_hash = self._password_hash.hash(
             "constant-dummy-password-never-used-for-login",
         )

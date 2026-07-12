@@ -1,23 +1,21 @@
-from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, String, func
+from sqlalchemy import CheckConstraint, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from infra.common.orm import Base
+from infra.orm.common import Base, CreatedAtMixin, IntegerIdMixin
 
 if TYPE_CHECKING:
     from infra.orm.likes import LikeOrm
     from infra.orm.users import UserOrm
 
 
-class PostOrm(Base):
+class PostOrm(IntegerIdMixin, CreatedAtMixin, Base):
     __tablename__ = "posts"
+    _created_at_index = True
     __table_args__ = (
         CheckConstraint("length(content) BETWEEN 1 AND 5000", name="content_len"),
     )
-
-    id: Mapped[int] = mapped_column(primary_key=True)
 
     author: Mapped["UserOrm"] = relationship(back_populates="posts")
     likes: Mapped[list["LikeOrm"]] = relationship(
@@ -32,8 +30,3 @@ class PostOrm(Base):
     )
 
     content: Mapped[str] = mapped_column(String(5000))
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-        index=True,
-    )

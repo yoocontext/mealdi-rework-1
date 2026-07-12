@@ -1,23 +1,21 @@
-from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, String, func
+from sqlalchemy import CheckConstraint, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from infra.common.orm import Base
+from infra.orm.common import Base, CreatedAtMixin, IntegerIdMixin
 
 if TYPE_CHECKING:
     from infra.orm.users import UserOrm
 
 
-class MessageOrm(Base):
+class MessageOrm(IntegerIdMixin, CreatedAtMixin, Base):
     __tablename__ = "messages"
+    _created_at_index = True
     __table_args__ = (
         CheckConstraint("sender_id <> recipient_id", name="different_users"),
         CheckConstraint("length(content) BETWEEN 1 AND 4000", name="content_len"),
     )
-
-    id: Mapped[int] = mapped_column(primary_key=True)
 
     sender: Mapped["UserOrm"] = relationship(
         back_populates="sent_messages",
@@ -38,8 +36,3 @@ class MessageOrm(Base):
     )
 
     content: Mapped[str] = mapped_column(String(4000))
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-        index=True,
-    )

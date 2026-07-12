@@ -1,10 +1,9 @@
-from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, String, func
+from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from infra.common.orm import Base
+from infra.orm.common import Base, CreatedAtMixin, IntegerIdMixin
 
 if TYPE_CHECKING:
     from infra.orm.likes import LikeOrm
@@ -13,10 +12,8 @@ if TYPE_CHECKING:
     from infra.orm.refresh_sessions import RefreshSessionOrm
 
 
-class UserOrm(Base):
+class UserOrm(IntegerIdMixin, CreatedAtMixin, Base):
     __tablename__ = "users"
-
-    id: Mapped[int] = mapped_column(primary_key=True)
 
     posts: Mapped[list["PostOrm"]] = relationship(
         back_populates="author",
@@ -49,7 +46,3 @@ class UserOrm(Base):
     email: Mapped[str] = mapped_column(String(320), unique=True, index=True)
     name: Mapped[str] = mapped_column(String(50), index=True)
     password_hash: Mapped[str] = mapped_column(String(255))
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-    )

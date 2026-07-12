@@ -2,6 +2,7 @@ from collections.abc import AsyncIterator
 from datetime import timedelta
 
 from dishka import Provider, Scope, provide
+from pwdlib import PasswordHash
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -64,8 +65,16 @@ class InfraProvider(Provider):
         return SystemClock()
 
     @provide(scope=Scope.APP)
-    def password_hasher(self) -> IPasswordHasher:
-        return Argon2PasswordHasher()
+    def password_hash(self) -> PasswordHash:
+        return PasswordHash.recommended()
+
+    @provide(scope=Scope.APP)
+    def password_hasher(
+        self,
+        *,
+        password_hash: PasswordHash,
+    ) -> IPasswordHasher:
+        return Argon2PasswordHasher(password_hash=password_hash)
 
     @provide(scope=Scope.APP)
     def token_service(
