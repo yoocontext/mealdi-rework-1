@@ -41,8 +41,9 @@ async function request(path, options = {}, retry = true) {
   const response = await fetch(`${apiRoot}${path}`, {...options, headers});
   if (response.status === 401 && retry && await refreshAccess()) return request(path, options, false);
   if (!response.ok) {
-    const error = await response.json().catch(() => ({detail: "Ошибка запроса"}));
-    throw new Error(error.detail || "Ошибка запроса");
+    const payload = await response.json().catch(() => null);
+    const fieldMessage = payload?.error?.fields?.[0]?.message;
+    throw new Error(fieldMessage || payload?.error?.message || payload?.detail || "Ошибка запроса");
   }
   return response.status === 204 ? null : response.json();
 }
@@ -50,7 +51,12 @@ async function request(path, options = {}, retry = true) {
 function showAuthenticated(authenticated) {
   byId("auth").hidden = authenticated;
   byId("nav").hidden = !authenticated;
-  if (authenticated) showView("feed");
+  if (authenticated) {
+    showView("feed").catch((error) => notify(error.message));
+  } else {
+    byId("feed").hidden = true;
+    byId("chat").hidden = true;
+  }
 }
 
 async function showView(view) {
@@ -76,20 +82,29 @@ function postNode(post) {
   article.querySelector(".post-content").textContent = post.content;
   article.querySelector("[data-like] span").textContent = post.likes_count;
   article.querySelector("[data-like]").onclick = async () => {
-    const result = await request(`/posts/${post.id}/likes/toggle`, {method: "POST"});
-    article.querySelector("[data-like] span").textContent = result.likes_count;
+    try {
+      const result = await request(`/posts/${post.id}/likes/toggle`, {method: "POST"});
+      article.querySelector("[data-like] span").textContent = result.likes_count;
+      notify("");
+    } catch (error) { notify(error.message); }
   };
   const edit = article.querySelector("[data-edit]");
   if (edit) edit.onclick = async () => {
     const content = prompt("Новый текст", post.content);
     if (!content) return;
-    await request(`/posts/${post.id}`, {method: "PUT", body: JSON.stringify({content})});
-    await loadPosts();
+    try {
+      await request(`/posts/${post.id}`, {method: "PUT", body: JSON.stringify({content})});
+      await loadPosts();
+      notify("");
+    } catch (error) { notify(error.message); }
   };
   const remove = article.querySelector("[data-delete]");
   if (remove) remove.onclick = async () => {
-    await request(`/posts/${post.id}`, {method: "DELETE"});
-    await loadPosts();
+    try {
+      await request(`/posts/${post.id}`, {method: "DELETE"});
+      await loadPosts();
+      notify("");
+    } catch (error) { notify(error.message); }
   };
   return article;
 }
@@ -156,32 +171,44 @@ byId("login-form").onsubmit = async (event) => {
 
 byId("register-form").onsubmit = async (event) => {
   event.preventDefault();
-  const values = Object.fromEntries(new FormData(event.currentTarget));
+  const form = event.currentTarget;
+  const values = Object.fromEntries(new FormData(form));
   try {
     await request("/auth/register", {method: "POST", body: JSON.stringify(values)});
     notify("Аккаунт создан — теперь войдите");
-    event.currentTarget.reset();
+    form.reset();
   } catch (error) { notify(error.message); }
 };
 
 byId("post-form").onsubmit = async (event) => {
   event.preventDefault();
-  const content = new FormData(event.currentTarget).get("content");
-  await request("/posts", {method: "POST", body: JSON.stringify({content})});
-  event.currentTarget.reset();
-  await loadPosts();
+  const form = event.currentTarget;
+  const content = new FormData(form).get("content");
+  try {
+    await request("/posts", {method: "POST", body: JSON.stringify({content})});
+    form.reset();
+    await loadPosts();
+    notify("");
+  } catch (error) { notify(error.message); }
 };
 
 byId("search-form").onsubmit = async (event) => {
   event.preventDefault();
-  await loadPosts(new FormData(event.currentTarget).get("q"));
+  try {
+    await loadPosts(new FormData(event.currentTarget).get("q"));
+    notify("");
+  } catch (error) { notify(error.message); }
 };
 
 byId("message-form").onsubmit = async (event) => {
   event.preventDefault();
-  const content = new FormData(event.currentTarget).get("content");
-  await request("/messages", {method: "POST", body: JSON.stringify({recipient_id: state.peer.id, content})});
-  event.currentTarget.reset();
+  const form = event.currentTarget;
+  const content = new FormData(form).get("content");
+  try {
+    await request("/messages", {method: "POST", body: JSON.stringify({recipient_id: state.peer.id, content})});
+    form.reset();
+    notify("");
+  } catch (error) { notify(error.message); }
 };
 
 byId("logout").onclick = async () => {

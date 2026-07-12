@@ -6,6 +6,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body { margin: 0; }
 button, input, textarea { font: inherit; }
 button {
@@ -44,7 +45,7 @@ header nav { display: flex; gap: .5rem; }
 .post-actions { display: flex; gap: .5rem; align-items: center; }
 .post-actions button { padding: .45rem .7rem; }
 .post-content { white-space: pre-wrap; overflow-wrap: anywhere; }
-.chat { grid-template-columns: 17rem 1fr; gap: 1rem; }
+.chat { display: grid; grid-template-columns: 17rem 1fr; gap: 1rem; }
 .users { display: grid; gap: .5rem; }
 .users button { width: 100%; text-align: left; color: #263b2e; background: #eef3ed; }
 .conversation { min-height: 34rem; display: grid; grid-template-rows: auto 1fr auto; }
