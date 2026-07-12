@@ -1,7 +1,84 @@
 [project]
-name = "mealdi-rework-1"
+name = "mealdi"
 version = "0.1.0"
-description = "Add your description here"
+description = "A small social feed and chat service"
 readme = "README.md"
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+  "alembic>=1.17.2",
+  "asyncpg>=0.31.0",
+  "dishka>=1.7.2",
+  "email-validator>=2.3.0",
+  "fastapi>=0.139.0",
+  "greenlet>=3.3.0",
+  "pwdlib[argon2]>=0.3.0",
+  "pydantic-settings>=2.14.1",
+  "pyjwt>=2.10.1",
+  "python-multipart>=0.0.22",
+  "sqlalchemy>=2.0.49",
+  "uvicorn>=0.41.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/bootstrap", "src/application", "src/delivery", "src/infra"]
+
+[dependency-groups]
+dev = [
+  "aiosqlite>=0.22.1",
+  "httpx>=0.28.1",
+  "mypy>=1.19.1",
+  "pytest>=9.0.2",
+  "pytest-asyncio>=1.3.0",
+  "pytest-cov>=7.0.0",
+  "ruff>=0.14.13",
+]
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "C90", "N", "UP", "B", "ASYNC"]
+ignore = ["E203", "UP037"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "tests"]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["src"]
+branch = true
+omit = ["*/migrations/*"]
+
+[tool.coverage.report]
+show_missing = true
+
+[tool.mypy]
+python_version = "3.14"
+plugins = ["pydantic.mypy"]
+strict = true
+exclude = ["migrations"]
+
+[[tool.mealdi.agents]]
+template = "agents/application.md"
+target = "src/application"
+
+[[tool.mealdi.agents]]
+template = "agents/use_cases.md"
+target = "src/application/use_cases"
+
+[[tool.mealdi.agents]]
+template = "agents/delivery.md"
+target = "src/delivery"
+
+[[tool.mealdi.agents]]
+template = "agents/dm.md"
+target = "src/infra/dm"
+
+[[tool.mealdi.agents]]
+template = "agents/orm.md"
+target = "src/infra/orm"

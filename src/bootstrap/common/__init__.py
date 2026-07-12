@@ -1,0 +1,1 @@
+"""Bootstrap-owned shared abstractions."""

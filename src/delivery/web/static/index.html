@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mealdi</title>
+    <link rel="stylesheet" href="/static/app.css">
+  </head>
+  <body>
+    <main class="shell">
+      <header>
+        <a class="brand" href="/">mealdi</a>
+        <nav id="nav" hidden>
+          <button data-view="feed">Лента</button>
+          <button data-view="chat">Чат</button>
+          <button id="logout" class="quiet">Выйти</button>
+        </nav>
+      </header>
+
+      <section id="notice" class="notice" hidden></section>
+
+      <section id="auth" class="auth-grid">
+        <form id="login-form" class="card">
+          <h1>С возвращением</h1>
+          <label>Email <input name="email" type="email" required></label>
+          <label>Пароль <input name="password" type="password" required></label>
+          <button>Войти</button>
+        </form>
+        <form id="register-form" class="card">
+          <h2>Новый аккаунт</h2>
+          <label>Имя <input name="name" minlength="2" maxlength="50" required></label>
+          <label>Email <input name="email" type="email" required></label>
+          <label>Пароль <input name="password" type="password" minlength="10" required></label>
+          <button>Зарегистрироваться</button>
+        </form>
+      </section>
+
+      <section id="feed" hidden>
+        <div class="toolbar card">
+          <form id="post-form">
+            <textarea name="content" maxlength="5000" placeholder="Что нового?" required></textarea>
+            <button>Опубликовать</button>
+          </form>
+          <form id="search-form" class="search">
+            <input name="q" maxlength="200" placeholder="Поиск по ленте">
+            <button>Найти</button>
+          </form>
+        </div>
+        <div id="posts" class="stack"></div>
+      </section>
+
+      <section id="chat" class="chat" hidden>
+        <aside class="card">
+          <h2>Люди</h2>
+          <div id="users" class="users"></div>
+        </aside>
+        <div class="card conversation">
+          <h2 id="peer-name">Выберите собеседника</h2>
+          <div id="messages" class="messages"></div>
+          <form id="message-form" hidden>
+            <input name="content" maxlength="4000" autocomplete="off" required>
+            <button>Отправить</button>
+          </form>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="/static/app.js"></script>
+  </body>
+</html>

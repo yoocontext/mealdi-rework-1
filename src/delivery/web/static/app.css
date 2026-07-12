@@ -1,0 +1,60 @@
+:root {
+  color-scheme: light;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  color: #17211b;
+  background: #f2f5ef;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+button, input, textarea { font: inherit; }
+button {
+  border: 0;
+  border-radius: .65rem;
+  padding: .7rem 1rem;
+  color: white;
+  background: #276749;
+  cursor: pointer;
+}
+button:hover { background: #1f513b; }
+button.quiet { color: #276749; background: #e4ede5; }
+input, textarea {
+  width: 100%;
+  border: 1px solid #cbd5ca;
+  border-radius: .65rem;
+  padding: .75rem;
+  background: white;
+}
+textarea { min-height: 7rem; resize: vertical; }
+label { display: grid; gap: .35rem; color: #526057; }
+h1, h2, p { margin-top: 0; }
+
+.shell { width: min(70rem, calc(100% - 2rem)); margin: auto; }
+header { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 0; }
+header nav { display: flex; gap: .5rem; }
+.brand { color: #1f513b; font-size: 1.6rem; font-weight: 800; text-decoration: none; }
+.card { border: 1px solid #dce4da; border-radius: 1rem; padding: 1.25rem; background: white; box-shadow: 0 10px 30px #3146370d; }
+.auth-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; max-width: 52rem; margin: 3rem auto; }
+.auth-grid form, .toolbar form { display: grid; gap: .9rem; }
+.notice { margin-bottom: 1rem; border-radius: .7rem; padding: .8rem 1rem; background: #fff2cc; }
+.toolbar { display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.search { align-content: end; }
+.stack { display: grid; gap: .8rem; }
+.post-meta { display: flex; justify-content: space-between; color: #647168; font-size: .9rem; }
+.post-actions { display: flex; gap: .5rem; align-items: center; }
+.post-actions button { padding: .45rem .7rem; }
+.post-content { white-space: pre-wrap; overflow-wrap: anywhere; }
+.chat { grid-template-columns: 17rem 1fr; gap: 1rem; }
+.users { display: grid; gap: .5rem; }
+.users button { width: 100%; text-align: left; color: #263b2e; background: #eef3ed; }
+.conversation { min-height: 34rem; display: grid; grid-template-rows: auto 1fr auto; }
+.messages { display: flex; flex-direction: column; gap: .5rem; overflow-y: auto; max-height: 29rem; }
+.message { max-width: 75%; border-radius: .8rem; padding: .65rem .8rem; background: #edf1ec; }
+.message.mine { align-self: end; color: white; background: #276749; }
+#message-form { display: grid; grid-template-columns: 1fr auto; gap: .5rem; margin-top: 1rem; }
+
+@media (max-width: 700px) {
+  .auth-grid, .toolbar, .chat { grid-template-columns: 1fr; }
+  header { align-items: flex-start; }
+  header nav { flex-wrap: wrap; justify-content: end; }
+}

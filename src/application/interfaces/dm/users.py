@@ -1,0 +1,13 @@
+from typing import Protocol
+
+from application.dto.users import User
+
+
+class IUserDm(Protocol):
+    async def get_by_id(self, *, user_id: int) -> User | None: ...
+
+    async def get_by_email(self, *, email: str) -> User | None: ...
+
+    async def list_except(self, *, user_id: int) -> tuple[User, ...]: ...
+
+    async def create(self, *, email: str, name: str, password_hash: str) -> User: ...
